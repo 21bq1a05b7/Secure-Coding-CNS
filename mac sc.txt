@@ -1,0 +1,43 @@
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Scanner;
+
+public class SimpleMACExample {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter message to authenticate: ");
+        String message = scanner.nextLine();
+
+        System.out.print("Enter secret key: ");
+        String secretKey = scanner.nextLine();
+
+        try {
+            String mac = generateMAC(message, secretKey);
+            System.out.println("MAC: " + mac);
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+
+        scanner.close();
+    }
+
+    private static String generateMAC(String message, String secretKey) throws NoSuchAlgorithmException {
+        String data = message + secretKey;
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hashBytes = digest.digest(data.getBytes());
+
+        // Convert the byte array to a hexadecimal string
+        StringBuilder hexString = new StringBuilder();
+        for (byte hashByte : hashBytes) {
+            String hex = Integer.toHexString(0xff & hashByte);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+
+        return hexString.toString();
+    }
+}
